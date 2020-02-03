@@ -1,0 +1,136 @@
+<!--onclick関数とupload関数-->
+<html lang="ja">
+  <head>
+    <meta http-equiv="content-type" content="text/html charset=UTF-8">
+    <style>
+      *{ margin: 0;padding: 0; }
+      html,body { height:100%; }
+      #container{ height: 50%;width: 60%;background-color: #000; }
+      #video{ height: 100%;width: 100%; }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+          integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+          crossorigin="anonymous"></script>
+    <script type="text/javascript">
+
+      window.onload = function(){
+           var media = navigator.mediaDevices.getUserMedia({
+               video:{facingMode:"user"},
+               audio:false
+           });
+           media.then((stream) =>{
+               video.srcObject = stream;
+           });
+          video.onloadeddata = function(){
+              var w = $('#video').width();
+              var h = $('#video').height();
+              $('#canvas').attr('width', w);
+              $('#canvas').attr('height', h);
+            }
+      }
+
+
+      function sendblob(blob) {//formDataにbase64をappendしてAjaxで送信
+
+        var hosturl = 'http://localhost:8080/upload';
+    		var formData = new FormData();
+    		formData.append('blob', blob);
+
+        //console.log(formData.get('blob'));
+
+    		$.ajax({
+    			type: 'POST',
+    			url: hosturl,
+    			data: formData,
+    			contentType: false,
+    			processData: false,
+          'async': true,
+    			success: function(data, textStatus){
+    				console.log(textStatus);
+
+    			},
+    			error: function(XMLHttpRequest, textStatus, errorThrown){
+
+            console.log("XMLHttpRequest : " + XMLHttpRequest.status);
+            console.log("textStatus     : " + textStatus);
+            console.log("errorThrown    : " + errorThrown.message);
+    			}
+
+		    });
+
+      }
+
+
+
+      function upserver() {//ボタンクリックで呼び出される関数
+
+        var canvas = document.getElementById('canvas');
+        //canvasの描画モードを2sに
+        var ctx = canvas.getContext('2d');
+        var img = document.getElementById('img');
+
+        //videoの縦幅横幅を取得
+        var w = video.offsetWidth;
+        var h = video.offsetHeight;
+
+        //同じサイズをcanvasに指定
+        canvas.setAttribute("width", w);
+        canvas.setAttribute("height", h);
+
+        //canvasにコピー
+        ctx.drawImage(video, 0, 0, w, h);
+
+        //imgにpng形式で書き出し
+        img.src = canvas.toDataURL('image/jpeg');
+
+        // base64エンコードされたデータを取得 「data:image/png;base64,iVBORw0k～」
+        var base64 = img.src;
+
+        sendblob(base64);
+
+         //画像がページ上に表示されないようにする
+         document.getElementById("canvas").style.display="none";
+       }
+
+       function Rename(){
+
+         fs.rename('localhost:8080/upload', path + _count + ex, function(err) {
+           if (err) {
+             fs.unlink(path + _count + ex);
+             fs.rename(files.upload.path, path + _count + ex);
+             console.log("rename失敗");
+           }
+         });
+
+
+         fs.writeFile(path + _count + ex, files, function(err)
+         {
+           if(err){
+
+               console.log("error");
+           }else{
+               console.log("ファイル書き込み成功");
+               _count++;
+               console.log(_count);
+           }
+
+         });
+
+
+       }
+       </script>
+       </head>
+       <body>
+           <div id="container">
+             <video id="video" autoplay ></video>
+             <input type="button" value="Stamp" onClick="upserver();">
+             <h2>保存した画像↓</h2>
+             <img id="img">
+             <video id="camera" autoplay></video>
+           <canvas id="canvas"></canvas>
+      </form>
+      </div>
+
+
+      </body>
+</html>
