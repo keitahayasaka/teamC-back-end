@@ -92,32 +92,6 @@
          document.getElementById("canvas").style.display="none";
        }
 
-       function Rename(){
-
-         fs.rename('localhost:8080/upload', path + _count + ex, function(err) {
-           if (err) {
-             fs.unlink(path + _count + ex);
-             fs.rename(files.upload.path, path + _count + ex);
-             console.log("rename失敗");
-           }
-         });
-
-
-         fs.writeFile(path + _count + ex, files, function(err)
-         {
-           if(err){
-
-               console.log("error");
-           }else{
-               console.log("ファイル書き込み成功");
-               _count++;
-               console.log(_count);
-           }
-
-         });
-
-
-       }
        </script>
        </head>
        <body>
