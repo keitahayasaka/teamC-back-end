@@ -1,8 +1,5 @@
 # teamC-back-end
 
-変更したのは以下の二つのファイルです.
-結局blobのURLでは保存が難しそうだったので,base64を保存するようにしたらうまくいきました.
-
 ●index.html
 ・upserver関数:カメラ画像からbase64エンコードされたデータを取得.
 ・sendblob関数:formDataにbase64をappendしてAjaxで送信.
